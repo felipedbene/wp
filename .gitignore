@@ -1,0 +1,67 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.so
+
+# Virtual environments
+.env/
+.venv/
+env/
+venv/
+
+# Editor and OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Python-specific artifacts
+*.egg
+*.egg-info/
+dist/
+build/
+pip-wheel-metadata/
+
+# Bedrock/Claude-generated JSON dumps (if you're logging output)
+*.jsonl
+*.json.dump
+
+# AWS credentials (just in case)
+*.pem
+*.key
+*.crt
+*.p12
+credentials*.json
+
+# Secrets and dotenvs
+*secret*
+.secret*
+.env
+.env.*
+
+# Kubernetes configs with secrets (optional precaution)
+k8s/*secret*.yaml
+k8s/*-secret.yaml
+
+# VSCode & JetBrains IDE configs
+.vscode/
+.idea/
+
+# Misc hidden files
+.*
+!.gitignore
+
+# Node junk (in case you use Amplify or frontend tools later)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Terraform (if infra evolves later)
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
+
+# Docker
+*.tar
+*.img
