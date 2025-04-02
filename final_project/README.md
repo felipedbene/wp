@@ -15,7 +15,7 @@ Because manually writing blog posts is *so* 2023. This project automatically gen
 - Fetches your latest WordPress posts (to understand your writing style, or lack thereof)
 - Analyzes content using Amazon Bedrock's Claude 3 Sonnet model (way smarter than your average blogger)
 - Generates new posts that sound suspiciously like you wrote them (but probably better)
-- Automatically generates images using Amazon Bedrock's Stable Diffusion XL model (results may vary from "masterpiece" to "modern art")
+- Automatically generates images using Stable Diffusion XL (because Titan was being dramatic)
 - Includes witty fallback messages when image generation fails (because sometimes AI needs a coffee break)
 - Handles multiple image placeholder formats (because consistency is overrated)
 - Automatically uploads everything to WordPress (so you can focus on your next coffee)
@@ -113,6 +113,12 @@ Edit the `blog-credentials.json` file with your WordPress credentials:
 
 Remember: If all else fails, the script will at least try to make you laugh with its error messages. Because if you're going to fail, fail with style!
 
+## Recent Improvements
+
+- **v1.2.0**: Switched from Amazon Titan Image Generator to Stable Diffusion XL because Titan was being a drama queen 👑
+- **v1.1.0**: Added REST API support with Markdown formatting for the modern blogger
+- **v1.0.0**: Initial release with all the bells and whistles (and occasional kazoos)
+
 # Created with Amazon Q
 This project was developed with assistance from Amazon Q, demonstrating the power of AI-assisted development.
 
@@ -124,5 +130,6 @@ Amazon Q helped with:
 - Troubleshooting
 - Author page creation
 - Showcase post generation
+- Saving developers from the depths of API documentation hell
 
 See [AmazonQ.md](AmazonQ.md) for more details.
