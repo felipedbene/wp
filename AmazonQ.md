@@ -22,6 +22,8 @@ Amazon Q helped develop a sophisticated Python script that:
 - **JSON Parsing**: Fixed issues with parsing Claude's JSON responses
 - **Cleanup Functionality**: Added ability to remove test posts
 - **Setup Automation**: Created a setup script using uv package manager
+- **Author Page**: Created an Amazon Q author page on WordPress
+- **Showcase Post**: Generated a showcase post introducing Amazon Q to the world
 
 ## Technical Implementation
 
@@ -49,3 +51,7 @@ Potential improvements that could be added:
 - Analytics integration to track post performance
 - Topic suggestion based on trending keywords
 - Comment moderation and response generation
+
+## Amazon Q Showcase
+
+Check out the [Hello World: Amazon Q Steps Out of the Shadows](https://blog.debene.dev/hello-world-amazon-q-steps-out-of-the-shadows/) post to see Amazon Q's writing style and personality in action.
