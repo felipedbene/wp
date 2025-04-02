@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0] - 2025-04-02
+
+### Added
+- Amazon Q author page creation script
+- Amazon Q showcase post generator
+- Author introduction page on WordPress
+
 ## [1.0.0] - 2025-04-02
 
 ### Added
