@@ -319,23 +319,21 @@ def extract_image_placeholders(markdown_content):
     return descriptions
 
 def generate_image(prompt):
-    """Generate an image using Amazon Titan Image Generator v2"""
+    """Generate an image using Stable Diffusion XL"""
     bedrock_runtime = boto3.client(
         service_name="bedrock-runtime",
         region_name=REGION
     )
     
-    # Keep prompt very short - Titan has a limit of ~77 tokens
-    # Truncate to ~10 words max to ensure we stay within limits
+    # Keep prompt very short but descriptive
     words = prompt.split()
     short_prompt = " ".join(words[:10]) if len(words) > 10 else prompt
     enhanced_prompt = f"Blog illustration: {short_prompt}"
     
     try:
-        # Use Stable Diffusion XL instead of Titan Image Generator
         print(f"Generating image with Stable Diffusion XL: '{enhanced_prompt}'")
         response = bedrock_runtime.invoke_model(
-            modelId="stability.stable-diffusion-xl-v1",
+            modelId=IMAGE_MODEL_ID,
             accept='application/json',
             contentType='application/json',
             body=json.dumps({
@@ -366,7 +364,7 @@ def generate_image(prompt):
         return image
             
     except Exception as e:
-        print(f"Error generating image with Amazon Titan Image Generator: {e}")
+        print(f"Error generating image with Stable Diffusion XL: {e}")
         # For debugging purposes, print more details about the error
         import traceback
         traceback.print_exc()
