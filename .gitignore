@@ -10,6 +10,7 @@ __pycache__/
 
 # Credentials
 blog-credentials.json
-
+credentials.json
+.secret
 # Temporary files
 *.tmp
