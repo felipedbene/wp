@@ -11,7 +11,7 @@ spec:
         spec:
           containers:
           - name: ai-blogging-butler
-            image: felipedbene/ai-blogging-butler:latest
+            image: fdebene/ai-butler:latest
             imagePullPolicy: Always
             resources:
               requests:
