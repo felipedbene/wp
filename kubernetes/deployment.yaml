@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-blogging-butler
+  labels:
+    app: ai-blogging-butler
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ai-blogging-butler
+  template:
+    metadata:
+      labels:
+        app: ai-blogging-butler
+    spec:
+      containers:
+      - name: ai-blogging-butler
+        image: ${YOUR_REGISTRY}/ai-blogging-butler:latest
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+        volumeMounts:
+        - name: credentials
+          mountPath: "/app/credentials"
+          readOnly: true
+        - name: aws-credentials
+          mountPath: "/root/.aws"
+          readOnly: true
+      volumes:
+      - name: credentials
+        secret:
+          secretName: blog-credentials
+      - name: aws-credentials
+        secret:
+          secretName: aws-credentials
+      restartPolicy: Always

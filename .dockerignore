@@ -1,0 +1,19 @@
+# Ignore everything in .gitignore
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.bak
+*.bak[0-9]*
+blog-credentials.json
+*.tmp
+
+# Docker specific ignores
+.git/
+.github/
+.gitignore
+.dockerignore
+Dockerfile
+kubernetes/
+README.md
+AmazonQ.md
