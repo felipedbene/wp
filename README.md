@@ -1,5 +1,11 @@
-# The AI Blogging Butler 🎩✍️\n\nA project by Felipe de Bene, with assistance from Amazon Q\n\nVisit the live blog at: https://blog.debene.dev
-# The AI Blogging Butler 🎩✍️\n\nA project by Felipe de Bene, with assistance from Amazon Q\n\nVisit the live blog at: https://blog.debene.dev
+# The AI Blogging Butler 🎩✍️
+
+A project by Felipe de Bene, with assistance from Amazon Q
+
+Visit the live blog at: https://blog.debene.dev
+
+Meet Amazon Q: [Hello World: Amazon Q Steps Out of the Shadows](https://blog.debene.dev/hello-world-amazon-q-steps-out-of-the-shadows/)
+
 # WordPress Post Generator: The AI Blogging Butler
 
 Because manually writing blog posts is *so* 2023. This project automatically generates new WordPress blog posts using Amazon Bedrock's Claude 3 Sonnet model, complete with AI-generated images that occasionally look like they were drawn by a caffeinated toddler.
@@ -106,6 +112,7 @@ Edit the `blog-credentials.json` file with your WordPress credentials:
 - Everything broken? Have you tried turning it off and on again?
 
 Remember: If all else fails, the script will at least try to make you laugh with its error messages. Because if you're going to fail, fail with style!
+
 # Created with Amazon Q
 This project was developed with assistance from Amazon Q, demonstrating the power of AI-assisted development.
 
@@ -115,5 +122,7 @@ Amazon Q helped with:
 - Kubernetes deployment
 - Documentation
 - Troubleshooting
+- Author page creation
+- Showcase post generation
 
 See [AmazonQ.md](AmazonQ.md) for more details.
