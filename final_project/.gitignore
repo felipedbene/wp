@@ -1,27 +1,22 @@
-# Python
+# Python virtual environment
+.venv/
 __pycache__/
 *.py[cod]
 *$py.class
-.venv/
-venv/
-ENV/
+
+# Test files
+sdxl_test_image.jpg
+generate_post_clarification_fe.md
+image_generation.py
 
 # Credentials
-blog-credentials.json
-kubernetes/secrets/secrets-actual.yaml
-kubernetes/secrets/secrets-ready.yaml
+blog-credentials*.json
+!blog-credentials-template*.json
 
-# Temporary files
-*.tmp
-*.temp
-*.log
-
-# OS specific
-.DS_Store
-Thumbs.db
-
-# IDE
+# IDE files
 .idea/
 .vscode/
-*.swp
-*.swo
+
+# OS specific files
+.DS_Store
+Thumbs.db
