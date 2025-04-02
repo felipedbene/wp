@@ -1,39 +1,43 @@
 # WordPress Post Generator
 
-This project automatically generates new WordPress blog posts using Amazon Bedrock's Claude model based on your existing content.
+Because manually writing blog posts is *so* 2023. This project automatically generates new WordPress blog posts using Amazon Bedrock's Claude 3 Sonnet model, complete with AI-generated images that occasionally look like they were drawn by a caffeinated toddler.
 
 ## Features
 
-- Fetches the latest 3 posts from your WordPress site
-- Analyzes the content using Amazon Bedrock's Claude model
-- Generates a new post with similar style and tone
-- Automatically generates images using Amazon Bedrock's Stable Diffusion XL model
-- Automatically publishes the post to your WordPress site with images
+- Fetches your latest WordPress posts (to understand your writing style, or lack thereof)
+- Analyzes content using Amazon Bedrock's Claude 3 Sonnet model (way smarter than your average blogger)
+- Generates new posts that sound suspiciously like you wrote them (but probably better)
+- Automatically generates images using Amazon Bedrock's Stable Diffusion XL model (results may vary from "masterpiece" to "modern art")
+- Includes witty fallback messages when image generation fails (because sometimes AI needs a coffee break)
+- Handles multiple image placeholder formats (because consistency is overrated)
+- Automatically uploads everything to WordPress (so you can focus on your next coffee)
+- Implements retry logic (because even AI has bad days)
 
 ## Prerequisites
 
-- Python 3.8+
-- [uv package manager](https://github.com/astral-sh/uv)
-- AWS credentials configured with Bedrock access
-- WordPress site with REST API access and application password
+- Python 3.8+ (because we're not savages)
+- [uv package manager](https://github.com/astral-sh/uv) (pip is so yesterday)
+- AWS credentials configured with Bedrock access (in us-west-2, because that's where the magic happens)
+- WordPress site with XML-RPC API access and application password (if your site doesn't support XML-RPC, welcome to debugging hell)
+- A sense of humor (required for reading error messages)
 
 ## Setup
 
-1. Make sure you have AWS credentials configured with access to Amazon Bedrock in the us-west-2 region.
+1. Make sure you have AWS credentials configured with access to Amazon Bedrock in us-west-2 (other regions are available, but why make life complicated?).
 
-2. Run the setup script:
+2. Run the setup script (because typing commands is hard):
    ```bash
    ./setup_and_run.sh
    ```
 
    This will:
-   - Create a virtual environment using uv
-   - Install required dependencies
-   - Run the post generator script
+   - Create a virtual environment using uv (because virtualenv is too mainstream)
+   - Install required dependencies (pray they're all compatible)
+   - Run the post generator script (fingers crossed)
 
 ## Manual Setup
 
-If you prefer to set up manually:
+If you enjoy doing things the hard way:
 
 1. Create a virtual environment:
    ```bash
@@ -48,28 +52,37 @@ If you prefer to set up manually:
 
 3. Run the script:
    ```bash
-   python generate_post.py
+   python generate_and_publish_post.py
    ```
 
 ## Configuration
 
-Edit the `generate_post.py` file to modify:
-
-- WordPress URL and credentials
-- AWS region and model ID
-- Post generation parameters
+Edit the `blog-credentials.json` file with your WordPress credentials:
+```json
+{
+  "xmlrpc_url": "https://your-blog.com/xmlrpc.php",
+  "username": "your_username",
+  "password": "your_application_password"
+}
+```
 
 ## How It Works
 
-1. The script fetches recent posts from your WordPress site via the REST API
-2. It formats these posts and sends them to Amazon Bedrock's Claude model
-3. Claude analyzes the content and generates a new post with similar style
-4. The script identifies image placeholders in the generated content
-5. It generates images using Amazon Bedrock's Stable Diffusion model
-6. The script posts the generated content with images back to WordPress
+1. The script fetches recent posts from your WordPress site via XML-RPC (because REST APIs are too easy)
+2. It formats these posts and sends them to Claude 3 Sonnet (who probably judges your writing style)
+3. Claude generates a new post with similar style (but with better grammar)
+4. The script identifies image placeholders in the generated content (formats include [IMAGE: description], because we're fancy)
+5. It attempts to generate images using Stable Diffusion XL (up to 2 times, because persistence is key)
+6. If image generation fails, you get a witty error message (because why be boring about failure?)
+7. Successfully generated images are uploaded to WordPress (assuming your upload directory permissions are correct, good luck with that)
+8. Finally, it publishes everything back to WordPress (and crosses its fingers)
 
 ## Troubleshooting
 
-- Ensure your AWS credentials have access to Bedrock
-- Verify your WordPress application password is correct
-- Check that the WordPress REST API is accessible
+- "Access Denied" from Bedrock? Check your AWS credentials and region (and maybe sacrifice a rubber duck)
+- WordPress authentication failing? Double-check your application password (and that XML-RPC isn't blocked)
+- Images not generating? Try again (and again, and maybe one more time)
+- Getting weird error messages? At least they're entertaining
+- Everything broken? Have you tried turning it off and on again?
+
+Remember: If all else fails, the script will at least try to make you laugh with its error messages. Because if you're going to fail, fail with style!
