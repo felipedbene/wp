@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.2.0] - 2025-04-02
+
+### Fixed
+- Switched from Amazon Titan Image Generator to Stable Diffusion XL for more reliable image generation
+- Fixed image generation request format to properly work with Stable Diffusion XL
+- Updated response parsing to extract images from the correct field in the response
+
+### Added
+- Test script for Stable Diffusion XL image generation
+
 ## [1.1.0] - 2025-04-02
 
 ### Added

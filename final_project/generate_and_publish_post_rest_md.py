@@ -7,7 +7,7 @@ This script:
 1. Fetches recent posts from your WordPress blog via REST API
 2. Analyzes them using Amazon Bedrock's Claude 3 Sonnet model
 3. Generates a new post in Markdown format with similar style and tone
-4. Creates images using Stable Diffusion XL for any image placeholders
+4. Creates images using Amazon Titan Image Generator for any image placeholders
 5. Publishes the complete post to your WordPress site
 """
 
@@ -30,18 +30,24 @@ import boto3
 # Constants
 REGION = "us-west-2"  # AWS region where Bedrock is available
 MODEL_ID = "anthropic.claude-3-sonnet-20240229-v1:0"  # Using Claude 3 Sonnet model
-IMAGE_MODEL_ID = "stability.stable-diffusion-xl-v1:0"  # Using Stable Diffusion XL
+IMAGE_MODEL_ID = "stability.stable-diffusion-xl-v1"  # Using Stable Diffusion XL
 
 def get_wp_credentials():
     """Load WordPress credentials from JSON file"""
     try:
         # Look for credentials in the current directory and parent directory
-        credential_paths = ['blog-credentials.json', '../blog-credentials.json']
+        credential_paths = [
+            'blog-credentials.json', 
+            '../blog-credentials.json',
+            'blog-credentials-rest.json',
+            '../blog-credentials-rest.json'
+        ]
         for path in credential_paths:
             if os.path.exists(path):
+                print(f"Found credentials at {path}")
                 with open(path, 'r') as f:
                     return json.load(f)
-        raise FileNotFoundError("Could not find blog-credentials.json")
+        raise FileNotFoundError("Could not find credentials file")
     except Exception as e:
         print(f"Error loading credentials: {e}")
         return None
@@ -296,36 +302,54 @@ Excerpt: Your excerpt here
 
 def extract_image_placeholders(markdown_content):
     """Extract image placeholders from Markdown content"""
-    # Match ![Image: description](image-placeholder) pattern
-    pattern = r'!\[Image:\s*(.*?)\]\(image-placeholder\)'
-    return re.findall(pattern, markdown_content)
+    # Match multiple image placeholder formats:
+    # 1. ![Image: description](image-placeholder)
+    # 2. [IMAGE: description]
+    # 3. [image: description]
+    patterns = [
+        r'!\[Image:\s*(.*?)\]\(image-placeholder\)',  # Markdown format
+        r'\[IMAGE:\s*(.*?)\]',                        # [IMAGE: description] format
+        r'\[image:\s*(.*?)\]'                         # [image: description] format
+    ]
+    
+    descriptions = []
+    for pattern in patterns:
+        descriptions.extend(re.findall(pattern, markdown_content))
+    
+    return descriptions
 
 def generate_image(prompt):
-    """Generate an image using Amazon Titan Image Generator G1 via Bedrock"""
+    """Generate an image using Amazon Titan Image Generator v2"""
     bedrock_runtime = boto3.client(
         service_name="bedrock-runtime",
         region_name=REGION
     )
     
-    # Enhanced prompt for better image quality
-    enhanced_prompt = f"High quality, professional blog illustration: {prompt}. Detailed, vibrant, modern style."
+    # Keep prompt very short - Titan has a limit of ~77 tokens
+    # Truncate to ~10 words max to ensure we stay within limits
+    words = prompt.split()
+    short_prompt = " ".join(words[:10]) if len(words) > 10 else prompt
+    enhanced_prompt = f"Blog illustration: {short_prompt}"
     
     try:
-        # Call Amazon Titan Image Generator G1 (supports on-demand throughput)
+        # Use Stable Diffusion XL instead of Titan Image Generator
+        print(f"Generating image with Stable Diffusion XL: '{enhanced_prompt}'")
         response = bedrock_runtime.invoke_model(
-            modelId="amazon.titan-image-generator-v1",
+            modelId="stability.stable-diffusion-xl-v1",
+            accept='application/json',
+            contentType='application/json',
             body=json.dumps({
-                "textToImageParams": {
-                    "text": enhanced_prompt,
-                    "negativeText": "poor quality, blurry, distorted, watermark"
-                },
-                "imageGenerationConfig": {
-                    "numberOfImages": 1,
-                    "height": 768,
-                    "width": 1024,
-                    "cfgScale": 8.0,
-                    "seed": random.randint(0, 4294967295)
-                }
+                "text_prompts": [
+                    {
+                        "text": enhanced_prompt,
+                        "weight": 1.0
+                    }
+                ],
+                "cfg_scale": 8.0,
+                "steps": 50,
+                "seed": random.randint(0, 4294967295),
+                "width": 512,
+                "height": 512
             })
         )
         
@@ -333,25 +357,26 @@ def generate_image(prompt):
         response_body = json.loads(response.get('body').read())
         
         # Get the base64 encoded image
-        base64_image = response_body.get('images')[0]
+        base64_image = response_body.get('artifacts')[0].get('base64')
         
         # Convert base64 to image
         image_data = base64.b64decode(base64_image)
         image = Image.open(io.BytesIO(image_data))
         
         return image
+            
     except Exception as e:
-        print(f"Error generating image: {e}")
+        print(f"Error generating image with Amazon Titan Image Generator: {e}")
         # For debugging purposes, print more details about the error
         import traceback
         traceback.print_exc()
         
         # Fallback to a placeholder image
-        print("Using fallback placeholder image instead")
+        print("Using placeholder image instead")
         try:
             # Create a simple colored placeholder with text
-            img = Image.new('RGB', (800, 600), color=(73, 109, 137))
-            from PIL import ImageDraw, ImageFont
+            img = Image.new('RGB', (800, 450), color=(73, 109, 137))
+            from PIL import ImageDraw
             d = ImageDraw.Draw(img)
             d.text((10,10), f"AI Image Placeholder\n\n{prompt}", fill=(255,255,255))
             return img
@@ -389,38 +414,55 @@ def replace_image_placeholders(wp_client, markdown_content, image_descriptions):
     """Replace image placeholders with actual WordPress images"""
     updated_content = markdown_content
     
+    # Define all the placeholder patterns we need to replace
+    placeholder_patterns = [
+        lambda desc: f'![Image: {desc}](image-placeholder)',
+        lambda desc: f'[IMAGE: {desc}]',
+        lambda desc: f'[image: {desc}]'
+    ]
+    
     for i, description in enumerate(image_descriptions):
-        placeholder = f'![Image: {description}](image-placeholder)'
+        print(f"Processing image {i+1}/{len(image_descriptions)}: {description}")
         
         # Try to generate image up to 2 times
         image = None
         for attempt in range(2):
+            print(f"  Attempt {attempt+1}/2 to generate image")
             image = generate_image(description)
             if image:
+                print("  Image generated successfully")
                 break
-            print(f"Retrying image generation for: {description}")
+            print(f"  Retrying image generation for: {description}")
             time.sleep(1)
         
         if image:
             # Upload image to WordPress
             sanitized_desc = re.sub(r'[^a-zA-Z0-9]', '-', description)[:40]
             filename = f"ai-image-{sanitized_desc}"
+            print(f"  Uploading image to WordPress as {filename}")
             uploaded = upload_image_to_wordpress(wp_client, image, filename, description)
             
             if uploaded:
+                print(f"  Image uploaded successfully: {uploaded['source_url']}")
                 # Create Markdown for the image with figure and caption
                 image_md = f'<figure class="wp-block-image size-large">\n'
                 image_md += f'<img src="{uploaded["source_url"]}" alt="{description}" />\n'
                 image_md += f'<figcaption>{description}</figcaption>\n'
                 image_md += '</figure>'
                 
-                # Replace the placeholder with the image HTML
-                updated_content = updated_content.replace(placeholder, image_md)
+                # Replace all possible placeholder formats with the image HTML
+                for pattern_func in placeholder_patterns:
+                    placeholder = pattern_func(description)
+                    updated_content = updated_content.replace(placeholder, image_md)
             else:
+                print("  Failed to upload image")
                 # If upload failed, replace with a message
                 fallback_msg = f'*Image generation failed for: {description}*'
-                updated_content = updated_content.replace(placeholder, fallback_msg)
+                for pattern_func in placeholder_patterns:
+                    placeholder = pattern_func(description)
+                    updated_content = updated_content.replace(placeholder, fallback_msg)
         else:
+            print("  Failed to generate image")
             # If generation failed, replace with a message
             fallback_messages = [
                 f'*AI tried to draw "{description}" but apparently needs more coffee.*',
@@ -428,15 +470,30 @@ def replace_image_placeholders(wp_client, markdown_content, image_descriptions):
                 f'*Our AI artist was feeling uninspired when trying to create: "{description}"*'
             ]
             fallback = random.choice(fallback_messages)
-            updated_content = updated_content.replace(placeholder, fallback)
+            for pattern_func in placeholder_patterns:
+                placeholder = pattern_func(description)
+                updated_content = updated_content.replace(placeholder, fallback)
     
     return updated_content
 
 def markdown_to_html(markdown_content):
     """Convert Markdown content to HTML for WordPress"""
-    # Use Python-Markdown to convert to HTML
-    html = markdown.markdown(markdown_content)
-    return html
+    try:
+        # Try to use extended markdown features
+        html = markdown.markdown(
+            markdown_content,
+            extensions=['extra', 'nl2br', 'sane_lists'],
+            output_format='html5'
+        )
+        return html
+    except ImportError:
+        # Fall back to basic markdown if extensions aren't available
+        print("Warning: Markdown extensions not available, using basic markdown conversion")
+        return markdown.markdown(markdown_content)
+    except Exception as e:
+        print(f"Error converting markdown to HTML: {e}")
+        # Return the original markdown as a fallback
+        return f"<pre>{markdown_content}</pre>"
 
 def publish_post_to_wordpress(wp_client, post_data):
     """Publish the generated post to WordPress via REST API"""
