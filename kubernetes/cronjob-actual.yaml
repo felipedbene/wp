@@ -1,0 +1,37 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ai-blogging-butler-scheduler
+spec:
+  schedule: "0 * * * *"  # Run hourly
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: ai-blogging-butler
+            image: felipedbene/ai-blogging-butler:latest
+            imagePullPolicy: Always
+            resources:
+              requests:
+                memory: "512Mi"
+                cpu: "500m"
+              limits:
+                memory: "1Gi"
+                cpu: "1000m"
+            volumeMounts:
+            - name: credentials
+              mountPath: "/app/credentials"
+              readOnly: true
+            - name: aws-credentials
+              mountPath: "/root/.aws"
+              readOnly: true
+          volumes:
+          - name: credentials
+            secret:
+              secretName: blog-credentials
+          - name: aws-credentials
+            secret:
+              secretName: aws-credentials
+          restartPolicy: OnFailure
