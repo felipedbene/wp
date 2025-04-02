@@ -35,6 +35,24 @@ Because manually writing blog posts is *so* 2023. This project automatically gen
    - Install required dependencies (pray they're all compatible)
    - Run the post generator script (fingers crossed)
 
+### Kubernetes Deployment
+
+For automated posting, deploy to Kubernetes:
+
+1. Build multi-architecture Docker images:
+   ```bash
+   ./build_multiarch_fixed.sh
+   ```
+
+2. Configure your Kubernetes secrets (see `kubernetes/secrets-template.yaml`)
+
+3. Apply the CronJob:
+   ```bash
+   kubectl apply -f kubernetes/cronjob-actual.yaml
+   ```
+
+See the `kubernetes/README.md` file for more details.
+
 ## Manual Setup
 
 If you enjoy doing things the hard way:
