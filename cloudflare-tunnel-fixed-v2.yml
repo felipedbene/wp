@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudflared
+  namespace: wp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloudflared
+  template:
+    metadata:
+      labels:
+        app: cloudflared
+    spec:
+      containers:
+        - name: cloudflared
+          image: cloudflare/cloudflared:latest
+          command: 
+            - "cloudflared" 
+            - "tunnel" 
+            - "run"
+          env:
+            - name: TUNNEL_ID
+              valueFrom:
+                secretKeyRef:
+                  name: cloudflared-secret
+                  key: tunnel-id
+          volumeMounts:
+            - name: cloudflared-creds
+              mountPath: /etc/cloudflared
+              readOnly: true
+      volumes:
+        - name: cloudflared-creds
+          secret:
+            secretName: cloudflared-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloudflared
+  namespace: wp
+spec:
+  selector:
+    app: cloudflared
+  ports:
+    - port: 80
+      targetPort: 80
