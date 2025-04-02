@@ -1,37 +1,44 @@
 #!/bin/bash
 
-# Colors for better readability
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+# The AI Blogging Butler setup script
+# Because typing commands is hard
 
-echo -e "${YELLOW}=== WordPress Post Generator Setup ===${NC}"
+echo "🤵 Welcome to The AI Blogging Butler setup! 🤵"
+echo "Let's get your automated blogging assistant ready..."
 
 # Check if uv is installed
 if ! command -v uv &> /dev/null; then
-    echo -e "${YELLOW}uv package manager not found. Installing...${NC}"
-    curl -LsSf https://astral.sh/uv/install.sh | sh
-    # Add uv to PATH for this session
-    export PATH="$HOME/.cargo/bin:$PATH"
+    echo "❌ uv package manager not found! Please install it first:"
+    echo "pip install uv"
+    exit 1
 fi
 
-# Create a virtual environment
-echo -e "${YELLOW}Creating virtual environment...${NC}"
+# Create virtual environment
+echo "🔧 Creating virtual environment with uv (because virtualenv is too mainstream)..."
 uv venv
 
-# Activate the virtual environment
-echo -e "${YELLOW}Activating virtual environment...${NC}"
+# Activate virtual environment
+echo "🔌 Activating virtual environment..."
 source .venv/bin/activate
 
-# Install required packages
-echo -e "${YELLOW}Installing required packages...${NC}"
-uv pip install boto3 requests
+# Install dependencies
+echo "📦 Installing dependencies (pray they're all compatible)..."
+uv pip install -r requirements.txt
 
-# Make the Python script executable
-chmod +x generate_post.py
+# Check if credentials file exists
+if [ ! -f "blog-credentials.json" ]; then
+    echo "⚠️ blog-credentials.json not found!"
+    echo "Please create this file with your WordPress credentials:"
+    echo '{
+  "xmlrpc_url": "https://your-blog.com/xmlrpc.php",
+  "username": "your_username",
+  "password": "your_application_password"
+}'
+    exit 1
+fi
 
 # Run the script
-echo -e "${YELLOW}Running the WordPress post generator...${NC}"
-python generate_post.py
+echo "🚀 Running the AI Blogging Butler (fingers crossed)..."
+python generate_and_publish_post.py
 
-echo -e "${GREEN}Done!${NC}"
+echo "✨ Setup complete! Your AI Blogging Butler is ready to serve."
