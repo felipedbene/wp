@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+
+# Credentials
+blog-credentials.json
+kubernetes/secrets/secrets-actual.yaml
+kubernetes/secrets/secrets-ready.yaml
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo

@@ -1,0 +1,12 @@
+schemaVersion: 2.0.0
+metadata:
+  name: python-developer-environment
+components:
+  - name: dev
+    container:
+      image: public.ecr.aws/aws-mde/universal-image:latest
+commands:
+  - id: install
+    exec:
+      component: dev
+      commandLine: "pip install -r requirements.txt && python generate_post.py"

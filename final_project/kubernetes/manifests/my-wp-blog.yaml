@@ -1,0 +1,115 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: wp
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: db-storage-mariadb-freakshow-0
+  namespace: wp
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 7Gi
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mariadb-freakshow
+  namespace: wp
+spec:
+  serviceName: mariadb-freakshow
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mariadb-freakshow
+  template:
+    metadata:
+      labels:
+        app: mariadb-freakshow
+    spec:
+      containers:
+        - name: mariadb
+          image: mariadb:11.4.5
+          env:
+            - name: MARIADB_ROOT_PASSWORD
+              value: "p@ssw0rd!o23d#@!#)(root)"
+            - name: MARIADB_DATABASE
+              value: wp_lounge420
+            - name: MARIADB_USER
+              value: yeetlord
+            - name: MARIADB_PASSWORD
+              value: "p@ssw0rd!o23d#@!#)()"
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - name: db-storage
+              mountPath: /var/lib/mysql
+  volumeClaimTemplates:
+    - metadata:
+        name: db-storage
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: longhorn
+        resources:
+          requests:
+            storage: 7Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mariadb-freakshow
+  namespace: wp
+spec:
+  selector:
+    app: mariadb-freakshow
+  ports:
+    - port: 3306
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wordpress-hellspawn
+  namespace: wp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wordpress-hellspawn
+  template:
+    metadata:
+      labels:
+        app: wordpress-hellspawn
+    spec:
+      containers:
+        - name: wp
+          image: wordpress:6.7
+          env:
+            - name: WORDPRESS_DB_HOST
+              value: mariadb-freakshow
+            - name: WORDPRESS_DB_USER
+              value: yeetlord
+            - name: WORDPRESS_DB_PASSWORD
+              value: "p@ssw0rd!o23d#@!#)()"
+            - name: WORDPRESS_DB_NAME
+              value: wp_lounge420
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wordpress-frenzy
+  namespace: wp
+spec:
+  selector:
+    app: wordpress-hellspawn
+  ports:
+    - port: 80
+      targetPort: 80
+  type: LoadBalancer
