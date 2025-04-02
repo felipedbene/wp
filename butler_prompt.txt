@@ -1,0 +1,10 @@
+Write a blog post about "The AI Blogging Butler" - an automated tool that uses AI to generate blog posts. The post should be witty, sarcastic, and humorous, explaining how this tool works, the benefits of automated content generation, and the irony of having AI write about AI. Include at least two places for images with [IMAGE: description] format. Make sure to include:
+
+1. A catchy title
+2. An introduction that hooks the reader
+3. An explanation of how the AI Blogging Butler works
+4. The benefits and potential drawbacks of automated content generation
+5. Some humorous anecdotes or scenarios
+6. A conclusion with a call to action
+
+The tone should be conversational, slightly sarcastic, and self-aware (as if the AI knows it's writing about itself). Include references to modern AI technology like Claude, GPT, and Stable Diffusion.
