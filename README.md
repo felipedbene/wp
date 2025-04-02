@@ -7,7 +7,7 @@ This project automatically generates new WordPress blog posts using Amazon Bedro
 - Fetches the latest 3 posts from your WordPress site
 - Analyzes the content using Amazon Bedrock's Claude model
 - Generates a new post with similar style and tone
-- Automatically generates images using Amazon Bedrock's Stable Diffusion model
+- Automatically generates images using Amazon Bedrock's Stable Diffusion XL model
 - Automatically publishes the post to your WordPress site with images
 
 ## Prerequisites
