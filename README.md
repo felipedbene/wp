@@ -1,3 +1,5 @@
+# The AI Blogging Butler 🎩✍️\n\nA project by Felipe de Bene, with assistance from Amazon Q\n\nVisit the live blog at: https://blog.debene.dev
+# The AI Blogging Butler 🎩✍️\n\nA project by Felipe de Bene, with assistance from Amazon Q\n\nVisit the live blog at: https://blog.debene.dev
 # WordPress Post Generator: The AI Blogging Butler
 
 Because manually writing blog posts is *so* 2023. This project automatically generates new WordPress blog posts using Amazon Bedrock's Claude 3 Sonnet model, complete with AI-generated images that occasionally look like they were drawn by a caffeinated toddler.
