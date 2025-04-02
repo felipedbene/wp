@@ -106,3 +106,14 @@ Edit the `blog-credentials.json` file with your WordPress credentials:
 - Everything broken? Have you tried turning it off and on again?
 
 Remember: If all else fails, the script will at least try to make you laugh with its error messages. Because if you're going to fail, fail with style!
+# Created with Amazon Q
+This project was developed with assistance from Amazon Q, demonstrating the power of AI-assisted development.
+
+Amazon Q helped with:
+- Python code development
+- AWS service integration
+- Kubernetes deployment
+- Documentation
+- Troubleshooting
+
+See [AmazonQ.md](AmazonQ.md) for more details.
