@@ -26,7 +26,7 @@ Because manually writing blog posts is *so* 2023. This project automatically gen
 - Python 3.8+ (because we're not savages)
 - [uv package manager](https://github.com/astral-sh/uv) (pip is so yesterday)
 - AWS credentials configured with Bedrock access (in us-west-2, because that's where the magic happens)
-- WordPress site with XML-RPC API access and application password (if your site doesn't support XML-RPC, welcome to debugging hell)
+- WordPress site with REST API access and application password (if your site doesn't support REST API, welcome to debugging hell)
 - A sense of humor (required for reading error messages)
 
 ## Setup
@@ -86,7 +86,7 @@ If you enjoy doing things the hard way:
 Edit the `blog-credentials.json` file with your WordPress credentials:
 ```json
 {
-  "xmlrpc_url": "https://your-blog.com/xmlrpc.php",
+  "site_url": "https://your-blog.com",
   "username": "your_username",
   "password": "your_application_password"
 }
@@ -94,7 +94,7 @@ Edit the `blog-credentials.json` file with your WordPress credentials:
 
 ## How It Works
 
-1. The script fetches recent posts from your WordPress site via XML-RPC (because REST APIs are too easy)
+1. The script fetches recent posts from your WordPress site via REST API (because XML-RPC is so 2010)
 2. It formats these posts and sends them to Claude 3 Sonnet (who probably judges your writing style)
 3. Claude generates a new post with similar style (but with better grammar)
 4. The script identifies image placeholders in the generated content (formats include [IMAGE: description], because we're fancy)
@@ -106,7 +106,7 @@ Edit the `blog-credentials.json` file with your WordPress credentials:
 ## Troubleshooting
 
 - "Access Denied" from Bedrock? Check your AWS credentials and region (and maybe sacrifice a rubber duck)
-- WordPress authentication failing? Double-check your application password (and that XML-RPC isn't blocked)
+- WordPress authentication failing? Double-check your application password (and that REST API access is enabled)
 - Images not generating? Try again (and again, and maybe one more time)
 - Getting weird error messages? At least they're entertaining
 - Everything broken? Have you tried turning it off and on again?

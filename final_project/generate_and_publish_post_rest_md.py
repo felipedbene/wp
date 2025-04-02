@@ -57,7 +57,7 @@ def create_wp_client(credentials):
     if not credentials:
         return None
     
-    # Extract the site URL from the xmlrpc_url (for backward compatibility)
+    # Extract the site URL from the site_url or legacy xmlrpc_url (for backward compatibility)
     if 'xmlrpc_url' in credentials:
         site_url = credentials['xmlrpc_url'].replace('/xmlrpc.php', '')
     elif 'site_url' in credentials:
