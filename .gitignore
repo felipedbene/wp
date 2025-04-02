@@ -1,16 +1,32 @@
-# Python virtual environment
-.venv/
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
-
-# Backup files
-*.bak
-*.bak[0-9]*
+.env
+.venv
+env/
+venv/
+ENV/
+.python-version
 
 # Credentials
 blog-credentials.json
-credentials.json
-.secret
+kubernetes/secrets-actual.yaml
+kubernetes/secrets-ready.yaml
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
 # Temporary files
-*.tmp
+tmp/
+temp/

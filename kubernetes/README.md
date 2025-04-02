@@ -1,65 +1,42 @@
-# Kubernetes Deployment for The AI Blogging Butler
+# Kubernetes Deployment for AI Blogging Butler
 
-Because manually deploying your AI butler is *so* last week. This guide will help you deploy The AI Blogging Butler to your Kubernetes cluster and schedule it to run hourly.
+This directory contains the Kubernetes manifests needed to deploy the AI Blogging Butler to a Kubernetes cluster.
 
-## Prerequisites
+## Components
 
-- A Kubernetes cluster (because what's the point of having Kubernetes if you're not going to use it?)
-- Docker installed locally (for building the image)
-- kubectl configured to talk to your cluster (otherwise you're just shouting commands into the void)
-- A container registry (Docker Hub, ECR, GCR, or whatever floats your container boat)
+- **CronJob**: Schedules the AI Blogging Butler to run on a regular basis (hourly by default)
+- **Secrets**: Stores WordPress credentials and AWS credentials securely
 
-## Setup Instructions
+## Deployment
 
-### 1. Build and Push the Docker Image
+To deploy the AI Blogging Butler to your Kubernetes cluster:
 
-```bash
-# Navigate to the project directory
-cd /path/to/wp
+1. Create the necessary secrets:
+   ```bash
+   # Create a secrets-actual.yaml file with your credentials
+   # DO NOT commit this file to Git!
+   ```
 
-# Build the Docker image
-docker build -t your-registry/ai-blogging-butler:latest .
+2. Apply the secrets to your cluster:
+   ```bash
+   kubectl apply -f kubernetes/secrets-actual.yaml
+   ```
 
-# Push to your registry
-docker push your-registry/ai-blogging-butler:latest
-```
+3. Apply the CronJob to your cluster:
+   ```bash
+   kubectl apply -f kubernetes/cronjob-actual.yaml
+   ```
 
-### 2. Update Kubernetes Manifests
+## Managing the CronJob
 
-Edit the following files to replace placeholders:
+- **Check status**: `kubectl get cronjobs`
+- **Suspend posting**: `kubectl patch cronjob ai-blogging-butler-scheduler -p '{"spec":{"suspend":true}}'`
+- **Resume posting**: `kubectl patch cronjob ai-blogging-butler-scheduler -p '{"spec":{"suspend":false}}'`
+- **Trigger manually**: `kubectl create job --from=cronjob/ai-blogging-butler-scheduler manual-post`
+- **View logs**: `kubectl logs job/ai-blogging-butler-scheduler-<job-id>`
 
-1. In `kubernetes/deployment.yaml` and `kubernetes/cronjob.yaml`:
-   - Replace `${YOUR_REGISTRY}` with your actual container registry path
+## Security Notes
 
-2. In `kubernetes/secrets.yaml`:
-   - Update the WordPress credentials
-   - Update the AWS credentials
-
-### 3. Apply the Kubernetes Manifests
-
-```bash
-# Create the secrets first
-kubectl apply -f kubernetes/secrets.yaml
-
-# Deploy the application
-kubectl apply -f kubernetes/deployment.yaml
-
-# Or if you prefer to use the CronJob instead of a persistent deployment
-kubectl apply -f kubernetes/cronjob.yaml
-```
-
-## How It Works
-
-1. The container starts and checks for mounted credentials
-2. It copies the credentials to the working directory
-3. It runs the AI Blogging Butler script
-4. If deployed as a CronJob, it runs hourly to check for GitHub updates and generate new posts
-
-## Troubleshooting
-
-- Pods crashing? Check the logs with `kubectl logs <pod-name>`
-- Credentials not working? Make sure your secrets are correctly formatted
-- Images not generating? Ensure your AWS credentials have access to Bedrock
-- Everything broken? At least you have Kubernetes to blame now!
-
-Remember: If all else fails, you can always fall back to running the script manually like a caveman.
+- Never commit actual secrets to Git
+- Use environment variables or a secure secrets manager in production
+- The `secrets-actual.yaml` file is in `.gitignore` to prevent accidental commits
