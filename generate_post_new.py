@@ -103,14 +103,7 @@ Format your response as valid JSON with these fields:
         )
         
         response_body = json.loads(response.get('body').read())
-        
-        # Handle the response format based on Claude model version
-        if isinstance(response_body.get('content'), list):
-            # Claude 3 format (list of content objects)
-            generated_text = response_body.get('content')[0].get('text', '')
-        else:
-            # Claude 2 format (string content)
-            generated_text = response_body.get('content', '')
+        generated_text = response_body.get('content', '')
         
         try:
             post_data = json.loads(generated_text)
