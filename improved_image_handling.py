@@ -25,78 +25,119 @@ def get_wp_credentials():
         return None
 
 def generate_image_with_bedrock(description):
-    """Generate an image using Amazon Bedrock's Titan Image Generator"""
-    try:
-        print(f"Starting image generation for: '{description}'")
-        bedrock_runtime = boto3.client(
-            service_name="bedrock-runtime",
-            region_name=AWS_REGION
-        )
-        
-        # Clean up the description if it ends with .jpg or other file extensions
-        if description.endswith('.jpg') or description.endswith('.png'):
-            description = description.rsplit('.', 1)[0]
-        
-        # Handle hyphenated descriptions by replacing with spaces
-        description = description.replace('-', ' ')
-        
-        # Make the prompt more generic and shorter to avoid validation errors
-        # Use a very simple prompt
-        if len(description) > 50:
-            safe_description = description[:50]
-        else:
-            safe_description = description
+    """Generate an image using Amazon Bedrock's Titan Image Generator with retry logic"""
+    for attempt in range(2):  # Try up to 2 times
+        try:
+            print(f"Starting image generation attempt {attempt + 1} for: '{description}'")
+            bedrock_runtime = boto3.client(
+                service_name="bedrock-runtime",
+                region_name=AWS_REGION
+            )
             
-        # Make the prompt even safer by removing potentially problematic words
-        safe_description = safe_description.replace("banging", "typing on")
-        safe_description = safe_description.replace("frustrated", "tired")
-        safe_description = safe_description.replace("angry", "unhappy")
+            # Clean up the description if it ends with .jpg or other file extensions
+            if description.endswith('.jpg') or description.endswith('.png'):
+                description = description.rsplit('.', 1)[0]
             
-        # Prepare the request for Titan Image Generator
-        request_body = {
-            "taskType": "TEXT_IMAGE",
-            "textToImageParams": {
-                "text": f"cartoon {safe_description}",
-                "negativeText": "blurry"
-            },
-            "imageGenerationConfig": {
-                "numberOfImages": 1,
-                "height": 512,
-                "width": 512,
-                "cfgScale": 8.0,
-                "seed": random.randint(0, 4294967295)
+            # Handle hyphenated descriptions by replacing with spaces
+            description = description.replace('-', ' ')
+            
+            # Make the prompt more generic and shorter to avoid validation errors
+            # Use a very simple prompt
+            if len(description) > 50:
+                safe_description = description[:50]
+            else:
+                safe_description = description
+                
+            # Make the prompt even safer by removing potentially problematic words
+            safe_description = safe_description.replace("banging", "typing on")
+            safe_description = safe_description.replace("frustrated", "tired")
+            safe_description = safe_description.replace("angry", "unhappy")
+                
+            # Prepare the request for Titan Image Generator
+            request_body = {
+                "taskType": "TEXT_IMAGE",
+                "textToImageParams": {
+                    "text": f"cartoon {safe_description}",
+                    "negativeText": "blurry"
+                },
+                "imageGenerationConfig": {
+                    "numberOfImages": 1,
+                    "height": 512,
+                    "width": 512,
+                    "cfgScale": 8.0,
+                    "seed": random.randint(0, 4294967295)
+                }
             }
-        }
-        
-        print(f"Calling Bedrock with request: {json.dumps(request_body)}")
-        
-        # Call Bedrock's Titan Image Generator
-        response = bedrock_runtime.invoke_model(
-            modelId="amazon.titan-image-generator-v1",
-            body=json.dumps(request_body)
-        )
-        
-        # Process the response
-        response_body = json.loads(response['body'].read())
-        print(f"Got response with keys: {list(response_body.keys())}")
-        
-        if 'images' in response_body and len(response_body['images']) > 0:
-            print(f"Found {len(response_body['images'])} images")
-            image_data = base64.b64decode(response_body['images'][0])
             
-            # Save to a temporary file
-            temp_image = tempfile.NamedTemporaryFile(suffix='.png', delete=False)
-            temp_image.write(image_data)
-            temp_image.close()
-            print(f"Image saved to temporary file: {temp_image.name}")
-            return temp_image.name
-        else:
-            print("No images found in response")
-            return None
+            print(f"Calling Bedrock with request: {json.dumps(request_body)}")
+            
+            # Call Bedrock's Titan Image Generator
+            response = bedrock_runtime.invoke_model(
+                modelId="amazon.titan-image-generator-v1",
+                body=json.dumps(request_body)
+            )
+            
+            # Process the response
+            response_body = json.loads(response['body'].read())
+            print(f"Got response with keys: {list(response_body.keys())}")
+            
+            if 'images' in response_body and len(response_body['images']) > 0:
+                print(f"Found {len(response_body['images'])} images")
+                image_data = base64.b64decode(response_body['images'][0])
+                
+                # Save to a temporary file
+                temp_image = tempfile.NamedTemporaryFile(suffix='.png', delete=False)
+                temp_image.write(image_data)
+                temp_image.close()
+                print(f"Image saved to temporary file: {temp_image.name}")
+                return temp_image.name
+            else:
+                print("No images found in response")
+                if attempt < 1:  # If this isn't the last attempt
+                    continue
+                # Generate a funny message image for the last attempt
+                return generate_error_message_image("There would be an image here, if I knew how to code!")
+        except Exception as e:
+            print(f"Error in attempt {attempt + 1} generating image: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            if attempt < 1:  # If this isn't the last attempt
+                print("Retrying image generation...")
+                continue
+            # Generate a funny message image for the last attempt
+            return generate_error_message_image("This space intentionally left blank (because the image generation failed)")
+    return None  # Should never reach here, but just in case
+
+def generate_error_message_image(message):
+    """Generate a simple image with an error message"""
+    try:
+        # Create a simple image with the error message
+        width = 512
+        height = 256
+        image = Image.new('RGB', (width, height), color='white')
+        draw = ImageDraw.Draw(image)
+        
+        # Try to load a font, fall back to default if not available
+        try:
+            font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 20)
+        except Exception:
+            font = ImageFont.load_default()
+        
+        # Draw the message
+        text_bbox = draw.textbbox((0, 0), message, font=font)
+        text_width = text_bbox[2] - text_bbox[0]
+        text_height = text_bbox[3] - text_bbox[1]
+        x = (width - text_width) / 2
+        y = (height - text_height) / 2
+        draw.text((x, y), message, font=font, fill='black')
+        
+        # Save to a temporary file
+        temp_image = tempfile.NamedTemporaryFile(suffix='.png', delete=False)
+        image.save(temp_image.name)
+        temp_image.close()
+        return temp_image.name
     except Exception as e:
-        print(f"Error generating image: {str(e)}")
-        import traceback
-        traceback.print_exc()
+        print(f"Error generating error message image: {str(e)}")
         return None
 
 def process_images_in_content(content):
