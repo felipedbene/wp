@@ -7,7 +7,7 @@ This script:
 1. Fetches recent posts from your WordPress blog via REST API
 2. Analyzes them using Amazon Bedrock's Claude 3 Sonnet model
 3. Generates a new post in Markdown format with similar style and tone
-4. Creates images using Amazon Titan Image Generator for any image placeholders
+4. Creates images using Stable Diffusion XL for any image placeholders
 5. Publishes the complete post to your WordPress site
 """
 
