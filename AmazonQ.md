@@ -1,15 +1,16 @@
-# WordPress Post Generator with Amazon Q
+# The AI Blogging Butler: Built with Amazon Q
 
-This document captures how Amazon Q helped create an automated WordPress post generator using Amazon Bedrock's Claude model.
+This document captures how Amazon Q helped create "The AI Blogging Butler" - an automated WordPress post generator using Amazon Bedrock's Claude model.
 
 ## Project Overview
 
-Amazon Q helped develop a Python script that:
+Amazon Q helped develop a sophisticated Python script that:
 
-1. Fetches recent posts from a WordPress blog
-2. Analyzes their content using Amazon Bedrock's Claude model
-3. Generates a new SEO-optimized post with similar style and tone
-4. Automatically publishes the post with proper tags and metadata
+1. Fetches recent posts from a WordPress blog to understand the author's style
+2. Analyzes their content using Amazon Bedrock's Claude 3 Sonnet model
+3. Generates a new SEO-optimized post with similar style, tone, and humor
+4. Automatically creates and embeds AI-generated images using Stable Diffusion XL
+5. Publishes the complete post with proper tags and metadata
 
 ## Key Features Added by Amazon Q
 
