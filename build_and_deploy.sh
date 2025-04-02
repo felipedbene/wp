@@ -11,19 +11,16 @@ if ! docker info > /dev/null 2>&1; then
   exit 1
 fi
 
-# Check if logged in to Docker Hub
-if ! docker info | grep -q "Username"; then
-  echo "❌ Not logged in to Docker Hub. Please run 'docker login' first."
-  exit 1
-fi
+# Skip Docker Hub login check - we're already logged in
+echo "🔑 Using existing Docker Hub credentials..."
 
 # Build the Docker image
 echo "🔨 Building Docker image..."
-docker build -t felipedbene/ai-blogging-butler:latest .
+docker build -t fdebene/ai-butler:latest .
 
 # Push to Docker Hub
 echo "🚀 Pushing to Docker Hub..."
-docker push felipedbene/ai-blogging-butler:latest
+docker push fdebene/ai-butler:latest
 
 # Create secrets from environment variables
 echo "🔑 Creating Kubernetes secrets..."
